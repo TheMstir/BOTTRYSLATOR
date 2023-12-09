@@ -1,20 +1,22 @@
 from aiogram import Router, F
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.types import Message, ReplyKeyboardRemove
 
-from keyboards.simple_row import make_row_keyboard
+from keybords import make_row_keyboard
 import languages
 
 router = Router()
 
+
 class LangChose(StatesGroup):
     """Переменные переключения языков"""
-    from_lang = State()
-    to_lang = State()
+    choosing_lang_from = State()
+    choosing_lang_to = State()
 
-@router.message(StateFilter(None), Command("сменить язык"))
+
+@router.message(Command("change"))
 async def cmd_food(message: Message, state: FSMContext):
     await message.answer(
         text="Выберите язык с которого будем переводить:",
@@ -50,6 +52,7 @@ async def food_size_chosen(message: Message, state: FSMContext):
         text=f"Вы выбрали Перевод с {user_data['chosen_from']} на {message.text.lower()}",
         reply_markup=ReplyKeyboardRemove()
     )
+
     await state.clear()
 
 

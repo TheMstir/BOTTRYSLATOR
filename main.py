@@ -1,15 +1,9 @@
 import asyncio
 import logging
-import time
 
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.utils.formatting import Text
-from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-#import statelang
-import translatefunk
-
-from googletrans import Translator
+from handlers import statelang, echosquad
 
 import config
 from aiogram import Dispatcher, types, Bot
@@ -19,23 +13,12 @@ logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
 )
-dp = Dispatcher(storage=MemoryStorage())
 
-# Включаем логирование, чтобы не пропустить важные сообщения
-logging.basicConfig(level=logging.INFO)
-# Объект бота
+
 bot = Bot(token=config.api_token, parse_mode='HTML')
-# Диспетчер
-dp = Dispatcher()
-
-
-def Textre(message_text, from_lang, to_lang):
-    """Прилетает сообщение и языкы на уровне api"""
-    """Базовая функция обращения к api google, не забыть убрать в дургой фаил"""
-
-    translator = Translator()
-    result = translator.translate(message_text, src=from_lang, dest=to_lang)
-    return result
+dp = Dispatcher(storage=MemoryStorage())
+dp.include_router(statelang.router)
+dp.include_router(echosquad.router)
 
 
 # Хэндлер на команду /start
@@ -55,50 +38,26 @@ async def cmd_start(message: types.Message):
 
     # TODO преддположим что бот берет инормацию о языке приложения и пишет стартовое сообщение на нем
     await message.answer("""Привет! Я маленький бот переводчик!\n
-                         У меня пока совсем крошечный функционал: 
-                         Ты можешь переключить язык перевода нажав на большую кнопку внизу\n
-                         Или переводи сразу! 
-                         Просто пиши сообщения, язык перевода по умолчанию en->ru!
-                         Помощь - /help""",
+У меня пока совсем крошечный функционал: 
+Ты можешь переключить язык перевода нажав на большую кнопку внизу\n
+    Или переводи сразу! 
+Просто пиши сообщения, язык перевода по умолчанию en->ru!
+    Помощь - /help""",
                          reply_markup=keyboard)
 
 
 @dp.message(Command("help"))
 async def help_menu(message: types.Message):
     """Информационное меню"""
-    await message.answer('''МЕНЮ:\nТут кратко описаны функции, которых на данный момент и нет:\n
-                         в идеале я научусь переводить с фотографий, при помощи библиотеки цифрового зрения\n
-                         и по возможности перенаправлять сообщения от пользователей к вам (может в виде чата)''')
-
-
-@dp.message()
-# Базовая функция данного бота на текщий момент,
-# возвращает сообщение и его перевод на выбранный язык
-# TODO сделать эхо цитатой
-async def echo(message: types.Message): # , froml, tol если их можно передать, но надо брать значения из состояний
-#    if froml == '' and tol == '':
-        # языки по умолчанию
-#        froml = 'English'
-#        tol = 'Russian'
-
-    translate_message = translatefunk.tryslator(message.text) # , froml, tol
-
-    #translate_message = Textre({message.text}, froml, tol)
-    await message.answer(f'''вы переводите: "{message.text}"\n
-                         Перевод: {translate_message}''')
+    await message.answer('''МЕНЮ:\nТут кратко описаны функции, которых на данный момент и нет:
+в идеале я научусь переводить с фотографий, при помощи библиотеки цифрового зрения
+и по возможности перенаправлять сообщения от пользователей к вам (может в виде чата)''')
 
 
 # Запуск процесса поллинга новых апдейтов
 async def main():
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
-    )
-
-  #  dp.include_router(statelang.router)
-
+    await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
-
 
 if __name__ == "__main__":
     asyncio.run(main())
