@@ -6,7 +6,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.utils.formatting import Text
 from aiogram.utils.keyboard import InlineKeyboardBuilder
 
-import statelang
+#import statelang
 import translatefunk
 
 from googletrans import Translator
@@ -59,7 +59,7 @@ async def cmd_start(message: types.Message):
                          Ты можешь переключить язык перевода нажав на большую кнопку внизу\n
                          Или переводи сразу! 
                          Просто пиши сообщения, язык перевода по умолчанию en->ru!
-                         Помощь - \help""",
+                         Помощь - /help""",
                          reply_markup=keyboard)
 
 
@@ -75,13 +75,13 @@ async def help_menu(message: types.Message):
 # Базовая функция данного бота на текщий момент,
 # возвращает сообщение и его перевод на выбранный язык
 # TODO сделать эхо цитатой
-async def echo(message: types.Message, froml, tol):
-    if froml == '' and tol == '':
+async def echo(message: types.Message): # , froml, tol если их можно передать, но надо брать значения из состояний
+#    if froml == '' and tol == '':
         # языки по умолчанию
-        froml = 'English'
-        tol = 'Russian'
+#        froml = 'English'
+#        tol = 'Russian'
 
-    translate_message = translatefunk.tryslator(message.text, froml, tol)
+    translate_message = translatefunk.tryslator(message.text) # , froml, tol
 
     #translate_message = Textre({message.text}, froml, tol)
     await message.answer(f'''вы переводите: "{message.text}"\n
@@ -95,13 +95,7 @@ async def main():
         format="%(asctime)s - %(levelname)s - %(name)s - %(message)s",
     )
 
-    # Если не указать storage, то по умолчанию всё равно будет MemoryStorage
-    # Но явное лучше неявного =]
-    dp = Dispatcher(storage=MemoryStorage())
-    bot = Bot(config.bot_token.get_secret_value())
-
-    dp.include_router(common.router)
-    dp.include_router(.router)
+  #  dp.include_router(statelang.router)
 
     await dp.start_polling(bot)
 
