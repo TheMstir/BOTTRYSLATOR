@@ -20,26 +20,25 @@ dp = Dispatcher(storage=MemoryStorage())
 dp.include_router(statelang.router)
 dp.include_router(echosquad.router)
 
+kb = [
+    [
+        types.KeyboardButton(text="/change_languages")
+    ],
+]
+keyboard = types.ReplyKeyboardMarkup(
+    keyboard=kb,
+    resize_keyboard=True,
+    input_field_placeholder=""
+)
 
 # Хэндлер на команду /start
 @dp.message(Command("start"))  # Команда для первичного запуска бота
 async def cmd_start(message: types.Message):
-    # кнопки которые появляются со стартом
-    kb = [
-        [
-            types.KeyboardButton(text="сменить язык")
-        ],
-    ]
-    keyboard = types.ReplyKeyboardMarkup(
-        keyboard=kb,
-        resize_keyboard=True,
-        input_field_placeholder=""
-    )
-
+    """Стартовый хедлер"""
     # TODO преддположим что бот берет инормацию о языке приложения и пишет стартовое сообщение на нем
     await message.answer("""Привет! Я маленький бот переводчик!\n
 У меня пока совсем крошечный функционал: 
-Ты можешь переключить язык перевода нажав на большую кнопку внизу\n
+Ты можешь переключить язык перевода нажав на большую кнопку внизу /change_languages\n
     Или переводи сразу! 
 Просто пиши сообщения, язык перевода по умолчанию en->ru!
     Помощь - /help""",

@@ -8,12 +8,9 @@ router = Router()
 # возвращает сообщение и его перевод на выбранный язык
 # TODO сделать эхо цитатой
 async def echo(message: types.Message): # , froml, tol если их можно передать, но надо брать значения из состояний
-#    if froml == '' and tol == '':
-        # языки по умолчанию
-#        froml = 'English'
-#        tol = 'Russian'
+    user_id = message.chat.id
 
-    translate_message = tryslator(message.text) # , froml, tol
+    translate_message = tryslator(message.text, user_id) # , froml, tol
 
     #translate_message = Textre({message.text}, froml, tol)
     await message.answer(f'''вы переводите: "{message.text}"\n

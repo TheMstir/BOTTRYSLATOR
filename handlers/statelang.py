@@ -6,6 +6,7 @@ from aiogram.types import Message, ReplyKeyboardRemove
 
 from keybords import make_row_keyboard
 import languages
+from translatefunk import get_language
 
 router = Router()
 
@@ -16,7 +17,7 @@ class LangChose(StatesGroup):
     choosing_lang_to = State()
 
 
-@router.message(Command("change"))
+@router.message(Command("change_languages"))
 async def cmd_food(message: Message, state: FSMContext):
     await message.answer(
         text="Выберите язык с которого будем переводить:",
@@ -24,7 +25,6 @@ async def cmd_food(message: Message, state: FSMContext):
     )
     # Устанавливаем пользователю состояние "выбирает язык на который переключиться"
     await state.set_state(LangChose.choosing_lang_from)
-
 
 
 @router.message(LangChose.choosing_lang_from, F.text.in_(languages.lang_from_list))
@@ -48,10 +48,12 @@ async def food_chosen_incorrectly(message: Message):
 @router.message(LangChose.choosing_lang_to, F.text.in_(languages.lang_to_list))
 async def food_size_chosen(message: Message, state: FSMContext):
     user_data = await state.get_data()
+    user_id = message.chat.id
     await message.answer(
         text=f"Вы выбрали Перевод с {user_data['chosen_from']} на {message.text.lower()}",
         reply_markup=ReplyKeyboardRemove()
     )
+    get_language(user_data['chosen_from'], message.text.lower(), user_id)
 
     await state.clear()
 
